@@ -1,6 +1,9 @@
 ---
 name: tmux
 description: "Remote control tmux sessions for interactive CLIs (python, gdb, etc.) by sending keystrokes and scraping pane output."
+based_on:
+  - https://github.com/mitsuhiko/agent-stuff/tree/main/skills/tmux
+  - https://github.com/ampcode/amp-contrib/tree/main/.agents/skills/tmux
 ---
 
 # tmux Skill
@@ -62,6 +65,14 @@ This must ALWAYS be printed right after a session was started and once again at 
 - You can also temporarily attach to observe: `tmux -S "$SOCKET" attach -t "$SESSION"`; detach with `Ctrl+b d`.
 - When giving instructions to a user, **explicitly print a copy/paste monitor command** alongside the action don't assume they remembered the command.
 
+## Saving output to file
+
+Capture full session history to a file for later analysis:
+
+```bash
+tmux -S "$SOCKET" capture-pane -p -S - -t "$SESSION":0.0 > "${SESSION//[^a-zA-Z0-9_-]/_}-$(date +%s).txt"
+```
+
 ## Spawning Processes
 
 Some special rules for processes:
@@ -111,3 +122,19 @@ tmux -S "$SOCKET" new-window -n "$SESSION" -d ';' send-keys -t "$SESSION" "npm s
 - `-i` poll interval seconds (default 0.5)
 - `-l` history lines to search from the pane (integer, default 1000)
 - Exits 0 on first match, 1 on timeout. On failure prints the last captured text to stderr to aid debugging.
+
+## screen fallback
+
+If tmux is unavailable, GNU screen provides similar functionality (more ubiquitous on older systems):
+
+```bash
+screen -dmS "$SESSION" bash        # start detached session
+screen -S "$SESSION" -X stuff 'python3 -q\n'  # send keys (\n = Enter)
+screen -S "$SESSION" -X hardcopy -h /tmp/out.txt && cat /tmp/out.txt  # capture
+screen -S "$SESSION" -X quit       # kill session
+```
+
+## See Also
+
+- [ALTERNATIVES.md](ALTERNATIVES.md) – comparison of process managers and terminal multiplexers
+- [OUTPUT-CAPTURE.md](OUTPUT-CAPTURE.md) – tools for terminal output capture and search
