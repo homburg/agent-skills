@@ -71,6 +71,8 @@ Use revsets to select commits:
 ### Squash Workflow (default)
 1. Make changes (auto-committed to @)
 2. `jj squash` to move changes into parent
+   - Use `-u` (`--use-destination-message`) to avoid editor prompts and keep the destination message
+   - Use `-m "message"` to set the squashed commit message explicitly
 3. `jj new` to start fresh working copy
 
 ### Edit Workflow
