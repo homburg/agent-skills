@@ -60,6 +60,7 @@ Use revsets to select commits:
 - `@` - Working copy commit
 - `@-` - Parent of working copy
 - `main` - The main bookmark
+- `main@origin` - Remote-tracked main when no local bookmark exists
 - `trunk()` - Main branch (main/master)
 - `ancestors(@, 5)` - Last 5 ancestors of @
 - `@::` - Working copy and all descendants
