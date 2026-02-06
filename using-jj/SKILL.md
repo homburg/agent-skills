@@ -21,7 +21,7 @@ Use `jj` instead of `git` when the repository contains a `.jj/` directory.
 |------|---------|
 | Status | `jj status` or `jj st` |
 | Log | `jj log` |
-| Diff | `jj diff` |
+| Diff | `jj diff --git` |
 | Describe current commit | `jj describe -m "message"` |
 | Create new empty commit | `jj new` |
 | Commit (describe + new) | `jj commit -m "message"` |
@@ -65,6 +65,11 @@ Use revsets to select commits:
 - `@::` - Working copy and all descendants
 - `::@` - Working copy and all ancestors
 - `visible_heads()` - All visible head commits
+
+## Diff Output Notes
+
+- Always use `jj diff --git` for diffs.
+- `jj diff` defaults to a line-numbered view that shows whole-file content for new files and aligned line changes for modified files and should be avoided.
 
 ## Workflows
 
