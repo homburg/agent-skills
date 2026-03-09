@@ -38,7 +38,7 @@ Use `jj` instead of `git` when the repository contains a `.jj/` directory.
 |------|---------|
 | Fetch | `jj git fetch` |
 | Push bookmark | `jj git push --bookmark <name>` |
-| Push new bookmark | `jj git push --bookmark <name> --allow-new` |
+| Push new bookmark | `jj git push --bookmark <name>` |
 | Push current change | `jj git push --change @` |
 | Clone | `jj git clone <url>` |
 | Init colocated repo | `jj git init --colocate` |
