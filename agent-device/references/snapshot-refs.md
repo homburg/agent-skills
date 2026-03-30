@@ -62,6 +62,7 @@ agent-device diff snapshot -i           # Shows +/− structural lines vs prior 
 ```
 
 Efficient pattern:
+
 - Initialize once at a stable point.
 - Mutate UI (`press`, `fill`, `swipe`).
 - Run `diff snapshot` after interactions to confirm expected change shape with bounded output.
@@ -75,6 +76,16 @@ Efficient pattern:
 ## Stop Conditions
 
 - If refs are unstable after UI transitions, switch to selector-based targeting and stop investing in ref-only flows.
+
+## find click response
+
+`find "<query>" click --json` returns deterministic matched-target metadata:
+
+```json
+{ "ref": "@e3", "locator": "any", "query": "Increment", "x": 195, "y": 422 }
+```
+
+Fields come from the matched snapshot node, not the platform runner. Use these for observability and replay quality — they are stable across runs for the same UI state.
 
 ## Replay note
 
