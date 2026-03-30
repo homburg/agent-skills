@@ -1,27 +1,51 @@
 ---
 name: importing-skills
-description: "Imports skill subdirectories from external repos using git subtree split. Use when adding or updating skills from another GitHub repository."
+description: "Imports skills from external repos. Use when adding or updating skills from another GitHub repository."
 ---
 
-# Importing Skills via Subtree Split
+# Importing Skills
 
-Import a subdirectory from an external Git repository as a subtree in this skills repo.
+## Recommended: `npx skills add`
 
-## Why subtree split?
+Use the [skills CLI](https://skills.sh/) to install skills from GitHub repos:
 
-`git subtree add` only works with entire repos. To import a **subdirectory** (e.g., `skills/agent-device` from a repo), we use `git subtree split` in a temporary clone to extract just that path into a standalone branch, then subtree-add from it.
+```bash
+# Install all skills from a repo, globally, for all agents
+npx skills add <owner>/<repo> -g --agent '*' --all
 
-## Local path convention
+# Install a specific skill
+npx skills add <owner>/<repo> -g --agent '*' --skill <name> -y
 
-Use the full GitHub path as the local directory prefix, like Go imports:
+# List available skills without installing
+npx skills add <owner>/<repo> --list
 
+# Check for updates
+npx skills check
+
+# Update all skills
+npx skills update
 ```
-github.com/<owner>/<repo>
+
+### Examples
+
+```bash
+# Vercel skills
+npx skills add vercel-labs/agent-skills -g --agent '*' --all
+
+# Callstack agent-device
+npx skills add callstackincubator/agent-device -g --agent '*' --all
 ```
 
-For example, importing from `https://github.com/callstackincubator/agent-device` lands in `./github.com/callstackincubator/agent-device`.
+### How it works
 
-## Adding a new skill from a subdirectory
+- `--agent '*'` installs to `~/.agents/skills/` (universal location) and symlinks from agent-specific directories
+- `--agent pi` copies directly to `~/.pi/agent/skills/` (pi-specific)
+- Includes security risk assessments (Gen, Socket, Snyk)
+- Tracks sources via `skills-lock.json`
+
+## Alternative: Git subtree split
+
+For repos not compatible with the skills CLI, or when you need more control:
 
 ```bash
 # 1. Clone the source repo into a temp directory
@@ -31,46 +55,25 @@ git clone --no-tags https://github.com/<owner>/<repo>.git "$TMPDIR"
 # 2. Split the subdirectory into a standalone branch
 git -C "$TMPDIR" subtree split -P <subdirectory-path> -b split-branch
 
-# 3. Add it as a subtree using the full GitHub path
-git subtree add --prefix=github.com/<owner>/<repo> "$TMPDIR" split-branch --squash
+# 3. Add it as a subtree
+git subtree add --prefix=<local-prefix> "$TMPDIR" split-branch --squash
 
 # 4. Clean up
 rm -rf "$TMPDIR"
 ```
 
-### Example
-
-Import `skills/agent-device` from `https://github.com/callstackincubator/agent-device`:
-
-```bash
-TMPDIR=$(mktemp -d)
-git clone --no-tags https://github.com/callstackincubator/agent-device.git "$TMPDIR"
-git -C "$TMPDIR" subtree split -P skills/agent-device -b split-branch
-git subtree add --prefix=github.com/callstackincubator/agent-device "$TMPDIR" split-branch --squash
-rm -rf "$TMPDIR"
-```
-
-## Adding a whole repo (no subdirectory)
-
-Skip the clone+split and use `git subtree add` directly:
-
-```bash
-git subtree add --prefix=github.com/<owner>/<repo> https://github.com/<owner>/<repo>.git <branch> --squash
-```
-
-## Updating an existing imported skill
-
-The same split approach, but use `subtree pull` instead of `subtree add`:
+### Updating a subtree import
 
 ```bash
 TMPDIR=$(mktemp -d)
 git clone --no-tags https://github.com/<owner>/<repo>.git "$TMPDIR"
 git -C "$TMPDIR" subtree split -P <subdirectory-path> -b split-branch
-git subtree pull --prefix=github.com/<owner>/<repo> "$TMPDIR" split-branch --squash
+git subtree pull --prefix=<local-prefix> "$TMPDIR" split-branch --squash
 rm -rf "$TMPDIR"
 ```
 
 ## Notes
 
-- `git subtree split` is **deterministic** — the same source commits produce the same SHAs, so repeated pulls work correctly.
-- Use `--squash` to avoid pulling the full upstream history into this repo.
+- Prefer `npx skills add` — it handles installs, updates, security scanning, and source tracking automatically.
+- Use `--squash` with git subtree to avoid pulling full upstream history.
+- `git subtree split` is **deterministic** — repeated pulls work correctly.
